@@ -9,15 +9,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Company {
     @Id
    // private String id; // Unique identifier
-    private String name; // Name of the company
-    private String location; // Physical or operational location
-    private String linkedInProfile; // URL to LinkedIn profile
-    private List<String> emails; // List of email addresses
-    private List<String> phoneNumbers; // List of phone numbers
-    private String comments; // Additional notes or information
-    private int communicationPeriodicity; // Interval for scheduled communications (in days)
+    private String name;
+    private String location;
+    private String linkedInProfile;
+    private List<String> emails;
+    private List<String> phoneNumbers;
+    private String comments; 
+    private int communicationPeriodicity; 
 
-    // Constructors, getters, and setters
     public Company(String name, String location, String linkedInProfile, List<String> emails, List<String> phoneNumbers, String comments, int communicationPeriodicity) {
         this.name = name;
         this.location = location;
@@ -27,14 +26,6 @@ public class Company {
         this.comments = comments;
         this.communicationPeriodicity = communicationPeriodicity;
     }
-
-    // public String getId() {
-    //     return id;
-    // }
-
-    // public void setId(String id) {
-    //     this.id = id;
-    // }
 
     public String getName() {
         return name;
