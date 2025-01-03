@@ -26,5 +26,8 @@ public class CommunicationLogService {
     public List<CommunicationLog> findByEmail(String email) {
       return communicationLogRepo.findByEmail(email);
     }
+    public List<CommunicationLog> findByEmailAndCompanyName(String email, String companyName) {
+      return communicationLogRepo.findByEmailAndCompanyName(email, companyName);
+  }
 
 }

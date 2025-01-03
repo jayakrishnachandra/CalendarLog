@@ -1,0 +1,10 @@
+
+
+       Failed to load resource: net::ERR_SSL_PROTOCOL_ERROR in react during api req
+       so i made : server.ssl.enabled=false
+       
+
+       issue with spaces in companu names
+
+       /company names
+       used encoded strings both fronted and backend..solved the issue          const encodedName = encodeURIComponent(MethodName);

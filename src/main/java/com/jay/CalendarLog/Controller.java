@@ -38,9 +38,8 @@ import com.jay.CalendarLog.Services.CompanyService;
 import com.jay.CalendarLog.Services.NotificationService;
 import com.jay.CalendarLog.Services.TokenService;
 
-
-@CrossOrigin(origins = "*") 
 @RestController
+@CrossOrigin(origins = "*") 
 public class Controller {
     @Autowired
     private CommunicationLogService communicationLogService;
@@ -151,6 +150,26 @@ public ResponseEntity<List<CommunicationLog>> getAllCommunicationLogs(HttpServle
     }
 
 
+    @GetMapping("/allLogs/{companyName}")
+    public ResponseEntity<List<CommunicationLog>> getCommunicationLogsByCompany(
+            @PathVariable String companyName, HttpServletRequest req) {
+        Optional<Token> dbToken = validateToken(req);
+        if (dbToken.isPresent()) {
+            Token token = dbToken.get();
+            if (!tokenService.isTokenExpired(token)) {
+                String email = token.getEmail();
+                List<CommunicationLog> logs = communicationLogService.findByEmailAndCompanyName(email, companyName);
+                if (logs.isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+                }
+                return ResponseEntity.ok(logs);
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.emptyList());
+    }
+
+
     @PostMapping(path = "/addCompany")
     public  ResponseEntity<Object> addCompany(HttpServletRequest req, @RequestBody Company company)
     {
@@ -164,19 +183,65 @@ public ResponseEntity<List<CommunicationLog>> getAllCommunicationLogs(HttpServle
 
     @DeleteMapping(path = "/deleteCompany/{name}")
     public ResponseEntity<Object> deleteCompany(HttpServletRequest req, @PathVariable String name) {
+        Optional<Token> dbToken = validateToken(req);
+        if (dbToken.isPresent() && !tokenService.isTokenExpired(dbToken.get())) {
+            Optional<Company> existingCompany = companyService.findCompanyByname(name);
+            if (existingCompany.isPresent()) {
+                companyService.delete(name);
+                return ResponseEntity.status(HttpStatus.OK).body("Company deleted successfully");
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Company not found");
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    }
+    
+
+    @GetMapping(path = "/getCompany/{name}")
+public ResponseEntity<Object> getCompany(HttpServletRequest req, @PathVariable String name) {
     Optional<Token> dbToken = validateToken(req);
     
     if (dbToken.isPresent() && !tokenService.isTokenExpired(dbToken.get())) {
-        Optional<Company> existingCompany = companyService.findCompanyByname(name);
-        if (existingCompany.isPresent()) {
-            companyService.delete(name);
-            
-            return ResponseEntity.status(HttpStatus.OK).body("Company deleted successfully");
+        Optional<Company> company = companyService.findCompanyByname(name);
+        if (company.isPresent()) {
+            return ResponseEntity.ok(company.get());
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Company not found");
     }
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 }
+
+
+    
+    @DeleteMapping(path = "/deleteCommunicationMethod/{name}")
+    public ResponseEntity<Object> deleteCommunicationMethod(HttpServletRequest req, @PathVariable String name) {
+    Optional<Token> dbToken = validateToken(req);
+    
+    if (dbToken.isPresent() && !tokenService.isTokenExpired(dbToken.get())) {
+        Optional<CommunicationMethod> existingCompany = communicationMethodService.findMethodByname(name);
+        if (existingCompany.isPresent()) {
+            communicationMethodService.delete(name);
+            
+            return ResponseEntity.status(HttpStatus.OK).body("Communication Method deleted successfully");
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Communication Method not found");
+    }
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    }
+
+    @GetMapping(path = "/getCommunicationMethod/{name}")
+public ResponseEntity<Object> getCommunicationMethod(HttpServletRequest req, @PathVariable String name) {
+    Optional<Token> dbToken = validateToken(req);
+    
+    if (dbToken.isPresent() && !tokenService.isTokenExpired(dbToken.get())) {
+        Optional<CommunicationMethod> method = communicationMethodService.findMethodByname(name);
+        if (method.isPresent()) {
+            return ResponseEntity.ok(method.get());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Communication Method not found");
+    }
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+}
+
 
 
     @PostMapping(path = "/addCommunicationMethod")

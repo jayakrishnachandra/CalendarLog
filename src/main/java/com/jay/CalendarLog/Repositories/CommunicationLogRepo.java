@@ -16,5 +16,7 @@ public interface CommunicationLogRepo extends MongoRepository<CommunicationLog, 
         List<CommunicationLog> findByEmailAndCommunicationDateAndCompletedFalse(String email, LocalDate date);
         List<CommunicationLog> findByEmail(String email);
         Optional<CommunicationLog> findByLogId(String logId);
+        List<CommunicationLog> findByEmailAndCompanyName(String email, String companyName);
+            
 
 }
